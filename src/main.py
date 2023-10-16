@@ -23,11 +23,11 @@ from vex import *
 brain=Brain()
 
 # Robot configuration code
-claw_motor = Motor(Ports.PORT3, GearSetting.RATIO_18_1, False)
-arm_motor = Motor(Ports.PORT8, GearSetting.RATIO_18_1, False)
+claw_motor = Motor(Ports.PORT20, GearSetting.RATIO_18_1, False)
+arm_motor = Motor(Ports.PORT12, GearSetting.RATIO_18_1, False)
 controller_1 = Controller(PRIMARY)
 left_motor = Motor(Ports.PORT1, GearSetting.RATIO_18_1, False)
-right_motor = Motor(Ports.PORT10, GearSetting.RATIO_18_1, True)
+right_motor = Motor(Ports.PORT11, GearSetting.RATIO_18_1, True)
 
 
 # Begin project code
