@@ -81,6 +81,9 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+
+	double maxSlowVelocity = 30;
+	double maxVelocity = 100;
 	//controller object
 	Controller controller;
 
@@ -94,9 +97,10 @@ void opcontrol() {
 	Motor backLeftMotor(LEFT_MOTOR_TWO_PORT, false, AbstractMotor::gearset::green, AbstractMotor::encoderUnits::degrees);
 	Motor frontRightMotor(RIGHT_MOTOR_ONE_PORT, true, AbstractMotor::gearset::green, AbstractMotor::encoderUnits::degrees);
 	Motor backRightMotor(RIGHT_MOTOR_TWO_PORT, true, AbstractMotor::gearset::green, AbstractMotor::encoderUnits::degrees);
+	ControllerButton slowButton(ControllerDigital::L2);
 	
 	// Chassis Controller - lets us drive the robot around with open- or closed-loop control
-	auto chassis = ChassisControllerBuilder()
+	std::shared_ptr<ChassisController> chassis = ChassisControllerBuilder()
 	        .withMotors(
 				 frontLeftMotor, frontRightMotor, backRightMotor, backLeftMotor   // Bottom left
 			)
@@ -120,11 +124,13 @@ void opcontrol() {
 		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
 		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
 		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);
-		
     // Tank drive with left and right sticks.
-    xModel->xArcade(controller.getAnalog(ControllerAnalog::leftX),
-                            controller.getAnalog(ControllerAnalog::leftY),
-							controller.getAnalog(ControllerAnalog::rightX));
+	double leftX = slowButton.isPressed() ? controller.getAnalog(ControllerAnalog::leftX) / 4 : controller.getAnalog(ControllerAnalog::leftX);
+	double leftY = slowButton.isPressed() ? controller.getAnalog(ControllerAnalog::leftY) / 4 : controller.getAnalog(ControllerAnalog::leftY);
+	double rightX = slowButton.isPressed() ? controller.getAnalog(ControllerAnalog::rightX) / 4 : controller.getAnalog(ControllerAnalog::rightX);
+
+
+    xModel->xArcade(leftX, leftY, rightX);
 		pros::delay(10);
 	
 	if (armUpButton.isPressed()) {
