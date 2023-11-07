@@ -1,41 +1,24 @@
 #include "main.h"
 
-#define ARM_MOTOR_PORT 12
-#define LEFT_MOTOR_ONE_PORT 1
+#define ARM_MOTOR_PORT 18
+#define LEFT_MOTOR_ONE_PORT 20
 #define LEFT_MOTOR_TWO_PORT 19
-#define RIGHT_MOTOR_ONE_PORT 11
-#define RIGHT_MOTOR_TWO_PORT 13
-#define CLAW_MOTOR_PORT 6
-
-
-/**
- * A callback function for LLEMU's center button.
- *
- * When this callback is fired, it will toggle line 2 of the LCD text between
- * "I was pressed!" and nothing.
- */
-void on_center_button() {
-	static bool pressed = false;
-	pressed = !pressed;
-	if (pressed) {
-		pros::lcd::set_text(2, "I was pressed!");
-	} else {
-		pros::lcd::clear_line(2);
-	}
-}
-
+#define RIGHT_MOTOR_ONE_PORT 16
+#define RIGHT_MOTOR_TWO_PORT 14
+#define CLAW_DOOR_MOTOR_PORT 17
+#define INERTIAL_SENSOR_PORT 11
 /**
  * Runs initialization code. This occurs as soon as the program is started.
  *
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
-void initialize() {
+void initialize()
+{
 	pros::lcd::initialize();
-	pros::lcd::set_text(1, "Hello PROS User!");
-
-	pros::lcd::register_btn1_cb(on_center_button);
+	pros::lcd::set_text(1, "Broke Engineers!");
 }
+
 /**
  * Runs while the robot is in the disabled state of Field Management System or
  * the VEX Competition Switch, following either autonomous or opcontrol. When
@@ -80,67 +63,176 @@ void autonomous() {}
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
-void opcontrol() {
+void opcontrol()
+{	
+	//field centric drive control
+	int newHeading = 0;
+	int chassisHeading, headingError, temp;
+	double forward, straff, turning;
+	float theta;
+	bool FieldCenteric = true;
 
-	double maxSlowVelocity = 30;
-	double maxVelocity = 100;
-	//controller object
+	// velocity variables
+	int slowMultiplier = 0.5;
+	//double maxSlowVelocity = 30;
+	//double maxVelocity = 100;
+
+	// controller object
 	Controller controller;
-
-	//arm motor control objects
-	Motor armMotor(-ARM_MOTOR_PORT);
 	ControllerButton armUpButton(ControllerDigital::A);
 	ControllerButton armDownButton(ControllerDigital::B);
+	ControllerButton slowButton(ControllerDigital::L2);
+	ControllerButton resetHeading(ControllerDigital::down);
+	ControllerButton enableFieldCentric(ControllerDigital::left);
+	ControllerButton doorIn(ControllerDigital::R1);
+	ControllerButton doorOut(ControllerDigital::R2);
+	ControllerButton runAuton(ControllerDigital::up);
+	ControllerButton tempDisableFieldCentric(ControllerDigital::L1);
 
-	//drivetrain
+	// inertial meausrement unit
+	pros::Imu inertialSensor(INERTIAL_SENSOR_PORT);
+
+	// arm
+	Motor armMotor(-ARM_MOTOR_PORT);
+	armMotor.setBrakeMode(AbstractMotor::brakeMode::hold);
+
+	//claw
+	Motor clawDoorMotor(CLAW_DOOR_MOTOR_PORT);
+
+	// drivetrain
 	Motor frontLeftMotor(LEFT_MOTOR_ONE_PORT, false, AbstractMotor::gearset::green, AbstractMotor::encoderUnits::degrees);
 	Motor backLeftMotor(LEFT_MOTOR_TWO_PORT, false, AbstractMotor::gearset::green, AbstractMotor::encoderUnits::degrees);
 	Motor frontRightMotor(RIGHT_MOTOR_ONE_PORT, true, AbstractMotor::gearset::green, AbstractMotor::encoderUnits::degrees);
 	Motor backRightMotor(RIGHT_MOTOR_TWO_PORT, true, AbstractMotor::gearset::green, AbstractMotor::encoderUnits::degrees);
-	ControllerButton slowButton(ControllerDigital::L2);
-	
+
+	// reset IMU
+	inertialSensor.reset();
+
 	// Chassis Controller - lets us drive the robot around with open- or closed-loop control
-	std::shared_ptr<ChassisController> chassis = ChassisControllerBuilder()
-	        .withMotors(
-				 frontLeftMotor, frontRightMotor, backRightMotor, backLeftMotor   // Bottom left
-			)
-	        // Green gearset, 4 in wheel diam, 11.5 in wheel track
-	        .withDimensions(AbstractMotor::gearset::green, {{4_in, 12_in}, imev5GreenTPR})
-			.withOdometry()
-	        .buildOdometry();
+	std::shared_ptr<OdomChassisController> chassis = ChassisControllerBuilder()
+													 .withMotors(
+														 frontLeftMotor, frontRightMotor, backRightMotor, backLeftMotor // Bottom left
+														 )
+													 // Green gearset, 4 in wheel diam, 11.5 in wheel track
+													 .withDimensions(AbstractMotor::gearset::green, {{4_in, 12_in}, imev5GreenTPR})
+													 .withMaxVelocity(90)
+													 .withOdometry()
+													 .buildOdometry();
+	// X-Drive Model for mecanum drive
+	std::shared_ptr<okapi::XDriveModel> driveTrain = std::dynamic_pointer_cast<XDriveModel>(chassis->getModel());
 	
-	auto xModel = std::dynamic_pointer_cast<XDriveModel>(chassis->getModel());
-	/*std::shared_ptr<ChassisController> drive =
-	    ChassisControllerBuilder()
-	        .withMotors(
-				 frontLeftMotor, frontRightMotor, backRightMotor, backLeftMotor   // Bottom left
-			)
-	        // Green gearset, 4 in wheel diam, 11.5 in wheel track
-	        .withDimensions(AbstractMotor::gearset::green, {{4_in, 11.5_in}, imev5GreenTPR})
-			.withOdometry()
-	        .buildOdometry();
-*/
-	while (true) {
-		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
-		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
-		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);
-    // Tank drive with left and right sticks.
-	double leftX = slowButton.isPressed() ? controller.getAnalog(ControllerAnalog::leftX) / 4 : controller.getAnalog(ControllerAnalog::leftX);
-	double leftY = slowButton.isPressed() ? controller.getAnalog(ControllerAnalog::leftY) / 4 : controller.getAnalog(ControllerAnalog::leftY);
-	double rightX = slowButton.isPressed() ? controller.getAnalog(ControllerAnalog::rightX) / 4 : controller.getAnalog(ControllerAnalog::rightX);
-
-
-    xModel->xArcade(leftX, leftY, rightX);
-		pros::delay(10);
-	
-	if (armUpButton.isPressed()) {
-                armMotor.moveVoltage(12000);
-            } else if (armDownButton.isPressed()) {
-                armMotor.moveVoltage(-12000);
-            } else {
-                armMotor.moveVoltage(0);
-            }
-
+	//wait for IMU to calibrate
+	while (inertialSensor.is_calibrating())
+	{
+		pros::delay(20);
 	}
 
+	//control loop
+	while (true)
+	{
+		//update heading based off IMU reading
+		chassisHeading = inertialSensor.get_heading() - headingError;
+
+		//get controller values
+		forward = controller.getAnalog(ControllerAnalog::leftY) * 100;
+		straff = controller.getAnalog(ControllerAnalog::leftX) * 100;
+		turning = controller.getAnalog(ControllerAnalog::rightX) * 100;
+
+		//coordinate transform.
+		theta = (-chassisHeading * 3.1415926535) / 180;
+		temp = forward * cos(theta) - straff * sin(theta);
+		straff = forward * sin(theta) + straff * cos(theta);
+		forward = temp;
+
+		//field centric drive control toggle button
+		if (enableFieldCentric.changedToPressed())
+		{
+			if (FieldCenteric == true)
+			{
+				controller.setText(1, 8, "False");
+				FieldCenteric = false;
+			}
+			else
+			{
+				controller.setText(1, 8, "True");
+				FieldCenteric = true;
+			}
+		}
+
+		//temporarly disable field centric drive control function
+		if (tempDisableFieldCentric.isPressed()) {
+			FieldCenteric == false;
+		} else {
+			FieldCenteric == true;
+		}
+
+		//reset heading function
+		if (resetHeading.isPressed())
+		{
+			headingError = inertialSensor.get_heading();
+		}
+
+		// set target stick values based off whether or not field centric mode is enabled
+		double TargetStraff = FieldCenteric ? straff / 100 : controller.getAnalog(ControllerAnalog::leftX);
+		double TargetForward = FieldCenteric ? forward / 100 : controller.getAnalog(ControllerAnalog::leftY);
+		double TargetTurning = FieldCenteric ? turning / 100 : controller.getAnalog(ControllerAnalog::rightX);
+
+		// scale values to max velocity
+		TargetStraff = slowButton.isPressed() ? TargetStraff * slowMultiplier : TargetStraff;
+		TargetForward = slowButton.isPressed() ? TargetForward * slowMultiplier : TargetForward;
+		TargetTurning = slowButton.isPressed() ? TargetTurning * slowMultiplier : TargetTurning;
+
+		// HARD CAP VELOCITY (TEMP)
+		TargetStraff = TargetStraff / 2;
+		TargetForward = TargetForward / 2;
+		TargetTurning = TargetTurning / 2;
+
+		// feed control input values to okapi chassis controller
+		driveTrain->xArcade(TargetStraff, TargetForward, TargetTurning,0);
+
+		// arm control
+		if (armUpButton.isPressed())
+		{
+			armMotor.moveVoltage(4000);
+		}
+		else if (armDownButton.isPressed())
+		{
+			armMotor.moveVoltage(-8000);
+		}
+		else
+		{
+			armMotor.moveVoltage(-1700);
+		}
+
+		// claw control
+		if (doorIn.isPressed())
+		{
+			clawDoorMotor.moveVoltage(3000);
+		}
+		else if (doorOut.isPressed())
+		{
+			clawDoorMotor.moveVoltage(-3000);
+		}
+		else
+		{
+			clawDoorMotor.moveVoltage(0);
+		}
+
+		// run auton
+		if (runAuton.isPressed())
+		{
+			std::cout << "Running Auton" << std::endl;
+			/**chassis->moveDistance(0.5_m);
+			chassis->moveDistance(-0.5_m);
+			chassis->turnAngle(90_deg);
+			chassis->moveDistance(4.5_ft);
+			chassis->turnAngle(-90_deg);
+			chassis->moveDistance(0.8_m); */
+			chassis->moveDistance(1_m);
+
+		}
+
+		// sleep at end of loop
+		pros::delay(20);
+	}
 }
