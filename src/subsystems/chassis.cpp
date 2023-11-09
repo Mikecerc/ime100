@@ -5,6 +5,7 @@ int newHeading = 0;
 int chassisHeading, headingError, temp;
 float theta;
 bool Fieldcentric = true;
+bool tempNotFieldCentric = false;
 bool slowMode = false;
 
 // inertial meausrement unit
@@ -18,13 +19,9 @@ Motor backRightMotor(Constants::Port::RightBackDrive, true, AbstractMotor::gears
 
 std::shared_ptr<ChassisController> chassis;
 std::shared_ptr<okapi::XDriveModel> driveTrain;
-
-void ChassisOpcontrol(void *param)
+void chassisInitialize()
 {
-    // reset IMU
-    // inertialSensor.reset();
-
-    // Chassis Controller - lets us drive the robot around with open- or closed-loop control
+    inertialSensor.reset();
     chassis = ChassisControllerBuilder()
                   .withMotors(
                       frontLeftMotor, frontRightMotor, backRightMotor, backLeftMotor // Bottom left
@@ -36,6 +33,13 @@ void ChassisOpcontrol(void *param)
                   .buildOdometry();
     // X-Drive Model for mecanum drive
     driveTrain = std::dynamic_pointer_cast<XDriveModel>(chassis->getModel());
+}
+void ChassisOpcontrol(void *param)
+{
+    // reset IMU
+    // inertialSensor.reset();
+
+    // Chassis Controller - lets us drive the robot around with open- or closed-loop control
 
     // wait for IMU to calibrate
     while (inertialSensor.is_calibrating())
@@ -46,9 +50,6 @@ void ChassisOpcontrol(void *param)
     // control loop
     while (true)
     {
-        // update heading based off IMU reading
-        chassisHeading = inertialSensor.get_heading() - headingError;
-
         // update field centric toggle button state
         controller.setText(1, 8, Fieldcentric ? "True" : "False");
     }
@@ -59,9 +60,12 @@ void resetHeading()
 }
 controllerValues computeFieldCentricValues(double forward, double straff, double turning)
 {
-    forward * 100;
-    straff * 100;
-    turning * 100;
+    // update heading based off IMU reading
+    chassisHeading = inertialSensor.get_heading() - headingError;
+
+    forward = forward * 100;
+    straff = straff * 100;
+    turning = turning * 100;
     // coordinate transform.
     theta = (-chassisHeading * 3.1415926535) / 180;
     temp = forward * cos(theta) - straff * sin(theta);
@@ -69,9 +73,9 @@ controllerValues computeFieldCentricValues(double forward, double straff, double
     forward = temp;
 
     // set target stick values based off whether or not field centric mode is enabled
-    double TargetStraff = Fieldcentric ? straff / 100 : controller.getAnalog(ControllerAnalog::leftX);
-    double TargetForward = Fieldcentric ? forward / 100 : controller.getAnalog(ControllerAnalog::leftY);
-    double TargetTurning = Fieldcentric ? turning / 100 : controller.getAnalog(ControllerAnalog::rightX);
+    double TargetStraff = (Fieldcentric && !tempNotFieldCentric) ? straff / 100 : controller.getAnalog(ControllerAnalog::leftX);
+    double TargetForward = (Fieldcentric && !tempNotFieldCentric) ? forward / 100 : controller.getAnalog(ControllerAnalog::leftY);
+    double TargetTurning = (Fieldcentric && !tempNotFieldCentric) ? turning / 100 : controller.getAnalog(ControllerAnalog::rightX);
 
     // scale values to max velocity
     TargetStraff = slowMode ? TargetStraff * Constants::Drivetrain::slowMultiplier : TargetStraff;
@@ -79,9 +83,8 @@ controllerValues computeFieldCentricValues(double forward, double straff, double
     TargetTurning = slowMode ? TargetTurning * Constants::Drivetrain::slowMultiplier : TargetTurning;
 
     // HARD CAP VELOCITY (TEMP)
-    TargetStraff = TargetStraff / 2;
-    TargetForward = TargetForward / 2;
-    TargetTurning = TargetTurning / 2;
-
+  //  TargetStraff = TargetStraff / 2;
+  //  TargetForward = TargetForward / 2;
+  //  TargetTurning = TargetTurning / 2;
     return {TargetForward, TargetStraff, TargetTurning};
 }

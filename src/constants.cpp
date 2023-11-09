@@ -6,20 +6,19 @@ const int Constants::Port::LeftBackDrive = 19;
 const int Constants::Port::RightFrontDrive = 16;
 const int Constants::Port::RightBackDrive = 14;
 const int Constants::Port::ArmMotor = 18;
-const int Constants::Port::ClawMotor = 15;
+const int Constants::Port::ClawMotor = 8;
 const int Constants::Port::ClawDoorMotor = 17;
 
 // sensor port assignments
 const int Constants::Port::InertialSensor = 11;
-const int Constants::Port::IntertialSensor2 = 12;
-const int Constants::Port::armRotationalSensor = 13;
+const int Constants::Port::IntertialSensor2 = 13;
+const int Constants::Port::armRotationalSensor = 12;
 
 // Drivetrain constants
 const ChassisScales Constants::Drivetrain::chassisDimensions = {{4_in, 12_in}, imev5GreenTPR};
- 
 const AbstractMotor::gearset Constants::Drivetrain::gearset = AbstractMotor::gearset::green;
-const int Constants::Drivetrain::maxVelocity = 90;
-const float Constants::Drivetrain::slowMultiplier = 0.5;
+const int Constants::Drivetrain::maxVelocity = 60;
+const float Constants::Drivetrain::slowMultiplier = 0.4;
 
 // Arm constants
 const AbstractMotor::gearset Constants::Arm::gearset = AbstractMotor::gearset::red;

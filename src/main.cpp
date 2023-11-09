@@ -58,7 +58,8 @@ void autonomous() {}
 void opcontrol()
 {
 	// tasks
-	pros::Task ChassisOpcontrol_TR(ChassisOpcontrol, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "chassis subsystem");
 	pros::Task RobotContainer_TR(RobotContainer, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "robot container");
 	pros::Task ManipulatorOpcontrol_TR(ManipulatorOpcontrol, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "manipulator subsystem");
+	pros::Task ChassisOpcontrol_TR(ChassisOpcontrol, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "chassis subsystem");
+	pros::Task ArmOpcontrol_TR(ArmOpcontrol, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "arm subsystem");
 }
