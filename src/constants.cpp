@@ -25,8 +25,10 @@ const AbstractMotor::gearset Constants::Arm::gearset = AbstractMotor::gearset::r
 const AbstractMotor::brakeMode Constants::Arm::brakeMode = AbstractMotor::brakeMode::hold;
 const double Constants::Arm::encoderOffset = 0;
 const double Constants::Arm::maxVelocity = 100;
+const double Constants::Arm::maxAngle = 30;
+const double Constants::Arm::minAngle = -45;
 // arm gains
-const double Constants::Arm::Gains::kP = 0.5;
-const double Constants::Arm::Gains::kI = 0.0;
-const double Constants::Arm::Gains::kD = 0.0;
+const double Constants::Arm::Gains::kP = 0.05;
+const double Constants::Arm::Gains::kI = 0.1;
+const double Constants::Arm::Gains::kD = 0.00;
 const double Constants::Arm::Gains::kBias = 0.0;

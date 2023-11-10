@@ -21,8 +21,6 @@ void RobotContainer(void *param)
     ControllerButton runAuton(ControllerDigital::up);
     ControllerButton tempDisableFieldCentric(ControllerDigital::L1);
 
-    chassisInitialize();
-
     // pros::Task ChassisOpcontrol_TR(ChassisOpcontrol, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "chassis subsystem");
     //  control loop
     while (true)
@@ -58,7 +56,7 @@ void RobotContainer(void *param)
         }
 
         // arm control
-        if (armDownButton.isPressed())
+        /**if (armDownButton.isPressed())
         {
             armMotor.moveVoltage(4000);
         }
@@ -69,6 +67,16 @@ void RobotContainer(void *param)
         else
         {
             armMotor.moveVoltage(-1700);
+        }
+        */
+
+       if (armDownButton.isPressed())
+        {
+            armTarget = -20;
+        }
+        else if (armUpButton.isPressed())
+        {
+            armTarget = 25;
         }
 
         // claw control

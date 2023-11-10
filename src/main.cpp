@@ -9,6 +9,9 @@ void initialize()
 {
 	pros::lcd::initialize();
 	pros::lcd::set_text(1, "Broke Engineers!");
+
+	chassisInitialize();
+	initializeArm();
 }
 
 /**

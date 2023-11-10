@@ -25,6 +25,8 @@ public:
         };
         static const double encoderOffset;
         static const double maxVelocity;
+        static const double maxAngle;
+        static const double minAngle;
     };
     class Port
     {
