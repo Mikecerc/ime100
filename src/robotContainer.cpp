@@ -10,8 +10,8 @@ void RobotContainer(void *param)
     ControllerButton armUpButton(ControllerDigital::A);
     ControllerButton armDownButton(ControllerDigital::B);
 
-    ControllerButton doorIn(ControllerDigital::X);
-    ControllerButton doorOut(ControllerDigital::Y);
+    //ControllerButton doorIn(ControllerDigital::X);
+    //ControllerButton doorOut(ControllerDigital::Y);
     ControllerButton clawIn(ControllerDigital::R1);
     ControllerButton clawOut(ControllerDigital::R2);
 
@@ -21,9 +21,6 @@ void RobotContainer(void *param)
     ControllerButton runAuton(ControllerDigital::up);
     ControllerButton tempDisableFieldCentric(ControllerDigital::L1);
 
-    chassisInitialize();
-
-    // pros::Task ChassisOpcontrol_TR(ChassisOpcontrol, (void *)"PROS", TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "chassis subsystem");
     //  control loop
     while (true)
     {
@@ -36,7 +33,6 @@ void RobotContainer(void *param)
         {
             pros::delay(20);
         }
-        std::cout << driveTrain << std::endl;
         driveTrain->xArcade(target.straff, target.forward, target.turning, 0);
 
         // field centric drive control toggle button
@@ -53,26 +49,20 @@ void RobotContainer(void *param)
 
         // reset heading function
         if (zeroHeading.isPressed())
-        {
             resetHeading();
-        }
 
-        // arm control
         if (armDownButton.isPressed())
         {
-            armMotor.moveVoltage(4000);
+            armTarget = -20;
         }
         else if (armUpButton.isPressed())
         {
-            armMotor.moveVoltage(-8000);
-        }
-        else
-        {
-            armMotor.moveVoltage(-1700);
+            armTarget = 30;
         }
 
         // claw control
-        if (doorIn.isPressed())
+        
+        /*if (doorIn.isPressed())
         {
             clawDoorMotor.moveVoltage(3000);
         }
@@ -83,7 +73,7 @@ void RobotContainer(void *param)
         else
         {
             clawDoorMotor.moveVoltage(0);
-        }
+        }*/
         if (clawIn.isPressed())
         {
             clawMotor.moveVoltage(12000);
