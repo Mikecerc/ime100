@@ -27,6 +27,14 @@ public:
         static const double maxVelocity;
         static const double maxAngle;
         static const double minAngle;
+        static const double maxVoltage;
+        class SetPoints
+        {
+        public:
+            static const float ground;
+            static const float mid;
+            static const float high;
+        };
     };
     class Port
     {

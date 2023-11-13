@@ -63,9 +63,11 @@ controllerValues computeFieldCentricValues(double forward, double straff, double
     // update heading based off IMU reading
     chassisHeading = inertialSensor.get_heading() - headingError;
 
+    // L floating point math moment
     forward = forward * 100;
     straff = straff * 100;
     turning = turning * 100;
+
     // coordinate transform.
     theta = (-chassisHeading * 3.1415926535) / 180;
     temp = forward * cos(theta) - straff * sin(theta);
@@ -77,14 +79,10 @@ controllerValues computeFieldCentricValues(double forward, double straff, double
     double TargetForward = (Fieldcentric && !tempNotFieldCentric) ? forward / 100 : controller.getAnalog(ControllerAnalog::leftY);
     double TargetTurning = (Fieldcentric && !tempNotFieldCentric) ? turning / 100 : controller.getAnalog(ControllerAnalog::rightX);
 
-    // scale values to max velocity
+    // scale values to slow mode multiplier
     TargetStraff = slowMode ? TargetStraff * Constants::Drivetrain::slowMultiplier : TargetStraff;
     TargetForward = slowMode ? TargetForward * Constants::Drivetrain::slowMultiplier : TargetForward;
     TargetTurning = slowMode ? TargetTurning * Constants::Drivetrain::slowMultiplier : TargetTurning;
 
-    // HARD CAP VELOCITY (TEMP)
-  //  TargetStraff = TargetStraff / 2;
-  //  TargetForward = TargetForward / 2;
-  //  TargetTurning = TargetTurning / 2;
     return {TargetForward, TargetStraff, TargetTurning};
 }
