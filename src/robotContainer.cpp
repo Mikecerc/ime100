@@ -7,7 +7,8 @@ controllerValues target;
 void RobotContainer(void *param)
 {
     int auton = 0;
-    controller.setText(1,0, "A: 0");
+    controller.setText(1, 0, "A: 0");
+    controller.setText(1, 8, "FC: T");
     ControllerButton armUpButton(ControllerDigital::A);
     ControllerButton armDownButton(ControllerDigital::B);
 
@@ -44,6 +45,8 @@ void RobotContainer(void *param)
         if (enableFieldCentric.changedToPressed())
         {
             Fieldcentric = !Fieldcentric;
+            // update field centric toggle button state
+            controller.setText(1, 8, Fieldcentric ? ", FC: T" : ", FC: F");
         }
 
         // temporarly disable field centric drive control function
@@ -92,18 +95,16 @@ void RobotContainer(void *param)
             clawMotor.moveVoltage(0);
         }
 
-        //auton cycle
+        // auton cycle
         if (cycleAutonUp.changedToPressed())
         {
-            std::cout << "Cycle Up" << std::endl;
             auton = auton + 1;
             if (auton > 2)
             {
                 auton = 0;
             }
-            const int32_t text = controller.setText(1,2,std::to_string(auton));
-            std::cout << text << std::endl;
-            std::cout << std::to_string(auton) << std::endl;
+            std::string string = "A:" + std::to_string(auton);
+            controller.setText(1, 0, string);
         }
         else if (cycleAutonDown.changedToPressed())
         {
@@ -112,26 +113,24 @@ void RobotContainer(void *param)
             {
                 auton = 2;
             }
-            std::cout << std::to_string(auton) << std::endl;
-            controller.setText(1,2,std::to_string(auton));
+            std::string string = "A:" + std::to_string(auton);
+            controller.setText(1, 0, string);
         }
 
         // run auton
         if (runAuton.isPressed())
         {
             std::cout << "Running Auton" << std::endl;
-           // chassis->moveDistance(1_m);
-           switch (auton) {
+            // chassis->moveDistance(1_m);
+            switch (auton)
+            {
             case 0:
-                std::cout << "A: 0" << std::endl;
-                controller.setText(1,0,"A: 0");
                 autons::simpleForward(chassis.get());
                 break;
             case 1:
-                controller.setText(1,0,"A: 1");
                 autons::sampleForward(chassis.get());
                 break;
-           };
+            };
         };
 
         // sleep at end of loop

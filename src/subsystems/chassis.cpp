@@ -50,8 +50,7 @@ void ChassisOpcontrol(void *param)
     // control loop
     while (true)
     {
-        // update field centric toggle button state
-        controller.setText(1, 8, Fieldcentric ? ", FC: T" : ", FC: F");
+        
         pros::delay(30);
     }
 }
