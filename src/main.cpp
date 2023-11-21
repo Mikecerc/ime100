@@ -8,7 +8,7 @@
 void initialize()
 {
 	pros::lcd::initialize();
-	pros::lcd::set_text(1, "sɹǝǝuᴉɓuƎ ǝʞoɹꓭ");
+	pros::lcd::set_text(1,"Womp");
 
 	chassisInitialize();
 	initializeArm();

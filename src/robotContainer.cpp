@@ -6,20 +6,25 @@ controllerValues target;
 
 void RobotContainer(void *param)
 {
-
+    int auton = 0;
+    controller.setText(1,0, "A: 0");
     ControllerButton armUpButton(ControllerDigital::A);
     ControllerButton armDownButton(ControllerDigital::B);
 
-    //ControllerButton doorIn(ControllerDigital::X);
-    //ControllerButton doorOut(ControllerDigital::Y);
+    // ControllerButton doorIn(ControllerDigital::X);
+    // ControllerButton doorOut(ControllerDigital::Y);
+    ControllerButton cycleAutonUp(ControllerDigital::right);
+    ControllerButton cycleAutonDown(ControllerDigital::left);
+    ControllerButton runAuton(ControllerDigital::up);
+
     ControllerButton clawIn(ControllerDigital::R1);
     ControllerButton clawOut(ControllerDigital::R2);
 
     ControllerButton slowButton(ControllerDigital::L2);
     ControllerButton zeroHeading(ControllerDigital::down);
-    ControllerButton enableFieldCentric(ControllerDigital::left);
-    ControllerButton runAuton(ControllerDigital::up);
-    ControllerButton tempDisableFieldCentric(ControllerDigital::L1);
+    ControllerButton enableFieldCentric(ControllerDigital::L1);
+
+    // ControllerButton tempDisableFieldCentric(ControllerDigital::L1);
 
     //  control loop
     while (true)
@@ -42,7 +47,7 @@ void RobotContainer(void *param)
         }
 
         // temporarly disable field centric drive control function
-        tempNotFieldCentric = tempDisableFieldCentric.isPressed();
+        // tempNotFieldCentric = tempDisableFieldCentric.isPressed();
 
         // slow mode toggle button
         slowMode = slowButton.isPressed();
@@ -61,7 +66,7 @@ void RobotContainer(void *param)
         }
 
         // claw control
-        
+
         /*if (doorIn.isPressed())
         {
             clawDoorMotor.moveVoltage(3000);
@@ -87,18 +92,47 @@ void RobotContainer(void *param)
             clawMotor.moveVoltage(0);
         }
 
+        //auton cycle
+        if (cycleAutonUp.changedToPressed())
+        {
+            std::cout << "Cycle Up" << std::endl;
+            auton = auton + 1;
+            if (auton > 2)
+            {
+                auton = 0;
+            }
+            const int32_t text = controller.setText(1,2,std::to_string(auton));
+            std::cout << text << std::endl;
+            std::cout << std::to_string(auton) << std::endl;
+        }
+        else if (cycleAutonDown.changedToPressed())
+        {
+            auton = auton - 1;
+            if (auton < 0)
+            {
+                auton = 2;
+            }
+            std::cout << std::to_string(auton) << std::endl;
+            controller.setText(1,2,std::to_string(auton));
+        }
+
         // run auton
         if (runAuton.isPressed())
         {
             std::cout << "Running Auton" << std::endl;
-            /**chassis->moveDistance(0.5_m);
-            chassis->moveDistance(-0.5_m);
-            chassis->turnAngle(90_deg);
-            chassis->moveDistance(4.5_ft);
-            chassis->turnAngle(-90_deg);
-            chassis->moveDistance(0.8_m); */
-            chassis->moveDistance(1_m);
-        }
+           // chassis->moveDistance(1_m);
+           switch (auton) {
+            case 0:
+                std::cout << "A: 0" << std::endl;
+                controller.setText(1,0,"A: 0");
+                autons::simpleForward(chassis.get());
+                break;
+            case 1:
+                controller.setText(1,0,"A: 1");
+                autons::sampleForward(chassis.get());
+                break;
+           };
+        };
 
         // sleep at end of loop
         pros::delay(20);
