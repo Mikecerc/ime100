@@ -36,7 +36,7 @@ void ArmOpcontrol(void *param)
           armMotor.moveVoltage(targetPower);
           
           //long to console
-          std::cout << "Angle: " << angle << " Error: " << error << " Target Power: " << targetPower << std::endl;
+          //std::cout << "Angle: " << angle << " Error: " << error << " Target Power: " << targetPower << std::endl;
           pros::delay(20);
      }
 }
