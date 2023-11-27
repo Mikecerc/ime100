@@ -1,5 +1,6 @@
 using namespace okapi;
 #pragma once
+extern void turnAngle(okapi::ChassisController *Chassis, double targetAngle_deg, pros::Imu inertialSensor);
 class autons
 {
 public:
@@ -17,20 +18,19 @@ public:
         pros::delay(1000);
          armTarget = Constants::Arm::SetPoints::mid;
         pros::delay(1000);
-        chassis->moveDistance(-0.5_m);
-        driveTrain->strafe(1);
-        chassis->waitUntilSettled();
-        pros::delay(2000);
-        driveTrain->strafe(0);
+        driveTrain->left(-1);
+        driveTrain->right(-1);
+        pros::delay(1000);
+        //turnAngle(Chassis, 180, inertialSensor);
         driveTrain->left(1);
         driveTrain->right(-1);
-        pros::delay(2300);
+        pros::delay(2500);
         driveTrain->left(0);
         driveTrain->right(0);
         armTarget = Constants::Arm::SetPoints::high;
         pros::delay(2000);
         chassis->moveDistance(1_m);
-        clawMotor.moveVoltage(-12000);
+        clawMotor.moveVoltage(12000);
         clawDoorMotor.moveVoltage(12000);
         pros::delay(1000);
         clawMotor.moveVoltage(0);

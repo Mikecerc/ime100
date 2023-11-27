@@ -73,15 +73,24 @@ void RobotContainer(void *param)
 
         if (doorIn.isPressed())
         {
+            doorHoldPowerOn = false;
             clawDoorMotor.moveVoltage(3000);
+
         }
         else if (doorOut.isPressed())
         {
+            doorHoldPowerOn = true;
             clawDoorMotor.moveVoltage(-3000);
         }
         else
         {
-            clawDoorMotor.moveVoltage(0);
+            if (doorHoldPowerOn && Constants::claw::doorHoldPower::enabled)
+            {
+                clawDoorMotor.moveVoltage(-Constants::claw::doorHoldPower::voltage);
+            }
+            else {
+                clawDoorMotor.moveVoltage(0);
+            }
         }
 
         if (clawIn.isPressed())

@@ -45,7 +45,14 @@ public:
             static const double voltage;
             static const bool enabled;
         };
+        class doorHoldPower
+        {
+        public:
+            static const double voltage;
+            static const bool enabled;
+        };
     };
+    
     class Port
     {
     public:
