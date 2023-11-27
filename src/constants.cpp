@@ -29,13 +29,17 @@ const double Constants::Arm::maxAngle = 30;
 const double Constants::Arm::minAngle = -45;
 const double Constants::Arm::maxVoltage = 12000;
 
+//claw constants
+const double Constants::claw::holdPower::voltage = 3000;
+const bool Constants::claw::holdPower::enabled = true;
+
 //arm set points
-const float Constants::Arm::SetPoints::ground = -40;
-const float Constants::Arm::SetPoints::mid = 0;
+const float Constants::Arm::SetPoints::ground = -20;
+const float Constants::Arm::SetPoints::mid = -5;
 const float Constants::Arm::SetPoints::high = 30;
 
 // arm gains
-const double Constants::Arm::Gains::kP = 637;
-const double Constants::Arm::Gains::kI = 250;
-const double Constants::Arm::Gains::kD = 6.5;
+const double Constants::Arm::Gains::kP = 1200;
+const double Constants::Arm::Gains::kI = 150;
+const double Constants::Arm::Gains::kD = 12;
 const double Constants::Arm::Gains::kBias = 0.0;

@@ -1,4 +1,5 @@
 #include "main.h"
+#include "subsystems/autons.h"
 // controller object
 Controller controller;
 
@@ -12,8 +13,8 @@ void RobotContainer(void *param)
     ControllerButton armUpButton(ControllerDigital::A);
     ControllerButton armDownButton(ControllerDigital::B);
 
-    // ControllerButton doorIn(ControllerDigital::X);
-    // ControllerButton doorOut(ControllerDigital::Y);
+    ControllerButton doorIn(ControllerDigital::X);
+    ControllerButton doorOut(ControllerDigital::Y);
     ControllerButton cycleAutonUp(ControllerDigital::right);
     ControllerButton cycleAutonDown(ControllerDigital::left);
     ControllerButton runAuton(ControllerDigital::up);
@@ -61,16 +62,16 @@ void RobotContainer(void *param)
 
         if (armDownButton.isPressed())
         {
-            armTarget = -20;
+            armTarget = Constants::Arm::SetPoints::ground;
         }
         else if (armUpButton.isPressed())
         {
-            armTarget = 30;
+            armTarget = Constants::Arm::SetPoints::high;
         }
 
         // claw control
 
-        /*if (doorIn.isPressed())
+        if (doorIn.isPressed())
         {
             clawDoorMotor.moveVoltage(3000);
         }
@@ -81,18 +82,28 @@ void RobotContainer(void *param)
         else
         {
             clawDoorMotor.moveVoltage(0);
-        }*/
+        }
+
         if (clawIn.isPressed())
         {
+            holdPowerOn = false;
             clawMotor.moveVoltage(12000);
         }
         else if (clawOut.isPressed())
         {
+            holdPowerOn = true;
             clawMotor.moveVoltage(-12000);
         }
         else
         {
-            clawMotor.moveVoltage(0);
+            if (holdPowerOn && Constants::claw::holdPower::enabled)
+            {
+                clawMotor.moveVoltage(-Constants::claw::holdPower::voltage);
+            }
+            else {
+                clawMotor.moveVoltage(0);
+            
+            }
         }
 
         // auton cycle

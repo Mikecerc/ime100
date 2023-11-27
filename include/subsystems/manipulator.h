@@ -3,5 +3,6 @@ using namespace okapi;
 
 extern Motor clawMotor; 
 extern Motor clawDoorMotor;
+extern bool holdPowerOn;
 
 extern void ManipulatorOpcontrol(void* param);
