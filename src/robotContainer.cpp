@@ -75,7 +75,6 @@ void RobotContainer(void *param)
         {
             doorHoldPowerOn = false;
             clawDoorMotor.moveVoltage(3000);
-
         }
         else if (doorOut.isPressed())
         {
@@ -88,7 +87,8 @@ void RobotContainer(void *param)
             {
                 clawDoorMotor.moveVoltage(-Constants::claw::doorHoldPower::voltage);
             }
-            else {
+            else
+            {
                 clawDoorMotor.moveVoltage(0);
             }
         }
@@ -109,9 +109,9 @@ void RobotContainer(void *param)
             {
                 clawMotor.moveVoltage(-Constants::claw::holdPower::voltage);
             }
-            else {
+            else
+            {
                 clawMotor.moveVoltage(0);
-            
             }
         }
 
@@ -149,6 +149,9 @@ void RobotContainer(void *param)
                 break;
             case 1:
                 autons::sampleForward(chassis.get());
+                break;
+            case 2:
+                autons::sample2(chassis.get());
                 break;
             };
         };
