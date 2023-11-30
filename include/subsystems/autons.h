@@ -12,15 +12,16 @@ public:
     {
         clawMotor.moveVoltage(-12000);
         pros::delay(1500);
+        clawMotor.moveVoltage(Constants::claw::holdPower::voltage);
         driveTrain->left(-0.2);
         driveTrain->right(-0.2);
         pros::delay(2000);
         driveTrain->left(0);
         driveTrain->right(0);
-        clawMotor.moveVoltage(Constants::claw::holdPower::voltage);
         clawDoorMotor.moveVoltage(-4000);
         pros::delay(2000);
-         armTarget = Constants::Arm::SetPoints::mid;
+        clawDoorMotor.moveVoltage(-2500);
+        armTarget = Constants::Arm::SetPoints::mid;
         pros::delay(1000);
         driveTrain->left(-0.7);
         driveTrain->right(-0.7);
@@ -49,17 +50,18 @@ public:
     }
     static void sample2(okapi::ChassisController *Chassis)
     {
-                clawMotor.moveVoltage(-12000);
+clawMotor.moveVoltage(-12000);
         pros::delay(1500);
+        clawMotor.moveVoltage(Constants::claw::holdPower::voltage);
         driveTrain->left(-0.2);
         driveTrain->right(-0.2);
         pros::delay(2000);
         driveTrain->left(0);
         driveTrain->right(0);
-        clawMotor.moveVoltage(Constants::claw::holdPower::voltage);
         clawDoorMotor.moveVoltage(-4000);
         pros::delay(2000);
-         armTarget = Constants::Arm::SetPoints::mid;
+        clawDoorMotor.moveVoltage(-2500);
+        armTarget = Constants::Arm::SetPoints::mid;
         pros::delay(1000);
         driveTrain->left(-0.7);
         driveTrain->right(-0.7);
