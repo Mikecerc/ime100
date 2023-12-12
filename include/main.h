@@ -46,7 +46,6 @@
 #include "subsystems/chassis.h"
 #include "subsystems/arm.h"
 #include "subsystems/manipulator.h"
-#include "subsystems/autons.h"
 
 
 /**

@@ -36,6 +36,23 @@ public:
             static const float high;
         };
     };
+    class claw
+    {
+    public:
+        class holdPower
+        {
+        public:
+            static const double voltage;
+            static const bool enabled;
+        };
+        class doorHoldPower
+        {
+        public:
+            static const double voltage;
+            static const bool enabled;
+        };
+    };
+    
     class Port
     {
     public:
